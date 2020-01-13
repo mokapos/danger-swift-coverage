@@ -56,7 +56,7 @@ public enum Coverage {
         report.sections.forEach {
             let projectCoverage = $0.getProjectCodeCoverage()
             if projectCoverage < minimumProjectCoverage {
-                danger.fail("Current project code coverage \(projectCoverage)% is below minimum threshold of \(minimumProjectCoverage)%")
+                danger.fail("Current project code coverage \(projectCoverage)% is lower than minimum threshold of \(minimumProjectCoverage)%")
             }
             
             danger.markdown($0.markdown(minimumCoverage: minumumCoverage))

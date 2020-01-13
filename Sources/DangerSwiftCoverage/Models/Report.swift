@@ -15,14 +15,22 @@ extension ReportSection {
     init(fromTarget target: Target) {
         targetProject = target
         titleText = "\(target.name): Coverage: \(target.percentageCoverage)%"
-        items = target.files.map { ReportFile(fileName: $0.name, coverage: $0.percentageCoverage) }
+        items = target.files
+            .filter({ (file) -> Bool in
+                return file.name.lowercased().hasSuffix(".swift")
+            })
+            .map { ReportFile(fileName: $0.name, coverage: $0.percentageCoverage) }
     }
 }
 
 extension ReportSection {
     init(fromSPM spm: SPMCoverage, fileManager: FileManager) {
         titleText = nil
-        items = spm.data.flatMap { $0.files.map { ReportFile(fileName: $0.filename.deletingPrefix(fileManager.currentDirectoryPath + "/"), coverage: $0.summary.percent) } }
+        items = spm.data.flatMap { $0.files
+            .filter({ (file) -> Bool in
+                return file.filename.lowercased().hasSuffix(".swift")
+            })
+            .map { ReportFile(fileName: $0.filename.deletingPrefix(fileManager.currentDirectoryPath + "/"), coverage: $0.summary.percent) } }
         targetProject = nil
     }
 }
