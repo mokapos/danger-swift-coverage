@@ -6,12 +6,14 @@ struct Report {
 }
 
 struct ReportSection {
+    let targetProject: Target?
     let titleText: String?
     let items: [ReportFile]
 }
 
 extension ReportSection {
     init(fromTarget target: Target) {
+        targetProject = target
         titleText = "\(target.name): Coverage: \(target.percentageCoverage)%"
         items = target.files.map { ReportFile(fileName: $0.name, coverage: $0.percentageCoverage) }
     }
@@ -21,10 +23,15 @@ extension ReportSection {
     init(fromSPM spm: SPMCoverage, fileManager: FileManager) {
         titleText = nil
         items = spm.data.flatMap { $0.files.map { ReportFile(fileName: $0.filename.deletingPrefix(fileManager.currentDirectoryPath + "/"), coverage: $0.summary.percent) } }
+        targetProject = nil
     }
 }
 
 extension ReportSection {
+    func getProjectCodeCoverage() -> Float {
+        return self.targetProject?.percentageCoverage ?? 0
+    }
+    
     func markdown(minimumCoverage: Float) -> String {
         var markdown = titleText != nil ? "## \(titleText!)\n" : ""
 
