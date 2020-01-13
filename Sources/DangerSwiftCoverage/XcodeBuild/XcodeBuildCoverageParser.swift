@@ -6,7 +6,22 @@ protocol XcodeBuildCoverageParsing {
 
 enum XcodeBuildCoverageParser: XcodeBuildCoverageParsing {
     static func coverage(xcresultBundlePath: String, files: [String], excludedTargets: [String], hideProjectCoverage: Bool) throws -> Report {
-        try coverage(xcresultBundlePath: xcresultBundlePath, files: files, excludedTargets: excludedTargets, hideProjectCoverage: hideProjectCoverage, xcCovParser: XcCovJSONParser.self)
+        var attemptCount: Int = 1
+        var lastError: Error?
+        
+        while attemptCount <= 3 {
+            do {
+                return try coverage(xcresultBundlePath: xcresultBundlePath, files: files, excludedTargets: excludedTargets, hideProjectCoverage: hideProjectCoverage, xcCovParser: XcCovJSONParser.self)
+            } catch let error {
+                lastError = error
+                attemptCount += 1
+            }
+        }
+        
+        if let error = lastError {
+            throw error
+        }
+        return Report(messages: [], sections: [])
     }
 
     static func coverage(xcresultBundlePath: String, files: [String], excludedTargets: [String], hideProjectCoverage: Bool = false, xcCovParser: XcCovJSONParsing.Type) throws -> Report {

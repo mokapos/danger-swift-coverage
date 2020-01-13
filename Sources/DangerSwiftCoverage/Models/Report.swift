@@ -12,7 +12,7 @@ struct ReportSection {
 
 extension ReportSection {
     init(fromTarget target: Target) {
-        titleText = "\(target.name): Coverage: \(target.percentageCoverage)"
+        titleText = "\(target.name): Coverage: \(target.percentageCoverage)%"
         items = target.files.map { ReportFile(fileName: $0.name, coverage: $0.percentageCoverage) }
     }
 }
